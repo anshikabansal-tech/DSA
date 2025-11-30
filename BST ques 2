@@ -36,4 +36,173 @@ Node* searchIter(Node* root, int key) {
     return NULL;
 }
 
-// ----------
+// ---------- (b) MAXIMUM ELEMENT ----------
+Node* findMax(Node* root) {
+    if (!root) return NULL;
+    while (root->right) root = root->right;
+    return root;
+}
+
+// ---------- (c) MINIMUM ELEMENT ----------
+Node* findMin(Node* root) {
+    if (!root) return NULL;
+    while (root->left) root = root->left;
+    return root;
+}
+
+// ---------- (d) INORDER SUCCESSOR ----------
+Node* inorderSuccessor(Node* root, int key) {
+    Node* curr = root;
+    Node* succ = NULL;
+
+    // Find the node with given key
+    while (curr && curr->key != key) {
+        if (key < curr->key) {
+            succ = curr;        // possible successor
+            curr = curr->left;
+        } else {
+            curr = curr->right;
+        }
+    }
+    if (!curr) return NULL;     // key not found
+
+    // Case 1: right subtree exists -> min of right subtree
+    if (curr->right) return findMin(curr->right);
+
+    // Case 2: no right subtree -> last stored succ
+    return succ;
+}
+
+// ---------- (e) INORDER PREDECESSOR ----------
+Node* inorderPredecessor(Node* root, int key) {
+    Node* curr = root;
+    Node* pred = NULL;
+
+    // Find the node
+    while (curr && curr->key != key) {
+        if (key > curr->key) {
+            pred = curr;        // possible predecessor
+            curr = curr->right;
+        } else {
+            curr = curr->left;
+        }
+    }
+    if (!curr) return NULL;     // key not found
+
+    // Case 1: left subtree exists -> max of left subtree
+    if (curr->left) return findMax(curr->left);
+
+    // Case 2: no left subtree -> last stored pred
+    return pred;
+}
+
+// Just to see tree in sorted order
+void inorder(Node* root) {
+    if (!root) return;
+    inorder(root->left);
+    cout << root->key << " ";
+    inorder(root->right);
+}
+
+int main() {
+    Node* root = NULL;
+    int n, x;
+
+    cout << "Enter number of nodes to insert in BST: ";
+    cin >> n;
+    cout << "Enter " << n << " elements (no duplicates):\n";
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        root = insertBST(root, x);
+    }
+
+    int choice, key;
+    while (true) {
+        cout << "\n--- BST MENU (Question 2) ---\n";
+        cout << "1. Search (Recursive)\n";
+        cout << "2. Search (Iterative)\n";
+        cout << "3. Maximum element\n";
+        cout << "4. Minimum element\n";
+        cout << "5. Inorder Successor of a key\n";
+        cout << "6. Inorder Predecessor of a key\n";
+        cout << "7. Display Inorder Traversal\n";
+        cout << "8. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter key to search: ";
+            cin >> key;
+            if (searchRec(root, key))
+                cout << "Key found (recursive search).\n";
+            else
+                cout << "Key NOT found.\n";
+            break;
+
+        case 2:
+            cout << "Enter key to search: ";
+            cin >> key;
+            if (searchIter(root, key))
+                cout << "Key found (iterative search).\n";
+            else
+                cout << "Key NOT found.\n";
+            break;
+
+        case 3: {
+            Node* mx = findMax(root);
+            if (mx) cout << "Maximum element = " << mx->key << endl;
+            else cout << "Tree is empty.\n";
+            break;
+        }
+
+        case 4: {
+            Node* mn = findMin(root);
+            if (mn) cout << "Minimum element = " << mn->key << endl;
+            else cout << "Tree is empty.\n";
+            break;
+        }
+
+        case 5:
+            cout << "Enter key whose inorder successor is required: ";
+            cin >> key;
+            if (!searchIter(root, key)) {
+                cout << "Key not present in BST.\n";
+            } else {
+                {
+                    Node* succ = inorderSuccessor(root, key);
+                    if (succ) cout << "Inorder successor of " << key << " = " << succ->key << endl;
+                    else cout << "No inorder successor exists (key is max).\n";
+                }
+            }
+            break;
+
+        case 6:
+            cout << "Enter key whose inorder predecessor is required: ";
+            cin >> key;
+            if (!searchIter(root, key)) {
+                cout << "Key not present in BST.\n";
+            } else {
+                {
+                    Node* pred = inorderPredecessor(root, key);
+                    if (pred) cout << "Inorder predecessor of " << key << " = " << pred->key << endl;
+                    else cout << "No inorder predecessor exists (key is min).\n";
+                }
+            }
+            break;
+
+        case 7:
+            cout << "Inorder traversal: ";
+            inorder(root);
+            cout << endl;
+            break;
+
+        case 8:
+            return 0;
+
+        default:
+            cout << "Invalid choice.\n";
+        }
+    }
+}
+
