@@ -1,0 +1,122 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int key;
+    Node *left, *right;
+    Node(int k) : key(k), left(NULL), right(NULL) {}
+};
+
+Node* insertBST(Node* root, int key) {
+    if (!root) return new Node(key);
+    if (key < root->key)
+        root->left = insertBST(root->left, key);
+    else if (key > root->key)
+        root->right = insertBST(root->right, key);
+    return root;
+}
+
+Node* findMin(Node* root) {
+    while (root && root->left)
+        root = root->left;
+    return root;
+}
+
+Node* deleteNode(Node* root, int key) {
+    if (!root) return root;
+    if (key < root->key)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->key)
+        root->right = deleteNode(root->right, key);
+    else {
+        if (!root->left) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        }
+        else if (!root->right) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+        Node* succ = findMin(root->right);
+        root->key = succ->key;
+        root->right = deleteNode(root->right, succ->key);
+    }
+    return root;
+}
+
+int maxDepth(Node* root) {
+    if (!root) return 0;
+    return 1 + max(maxDepth(root->left), maxDepth(root->right));
+}
+
+int minDepth(Node* root) {
+    if (!root) return 0;
+    if (!root->left && !root->right) return 1;
+    if (!root->left)
+        return 1 + minDepth(root->right);
+    if (!root->right)
+        return 1 + minDepth(root->left);
+    return 1 + min(minDepth(root->left), minDepth(root->right));
+}
+
+void inorder(Node* root) {
+    if (!root) return;
+    inorder(root->left);
+    cout << root->key << " ";
+    inorder(root->right);
+}
+
+int main() {
+    Node* root = NULL;
+    int choice, key;
+
+    while (true) {
+        cout << "\n--- BST MENU (Q3) ---\n";
+        cout << "1. Insert\n";
+        cout << "2. Delete\n";
+        cout << "3. Maximum Depth\n";
+        cout << "4. Minimum Depth\n";
+        cout << "5. Display Inorder Traversal\n";
+        cout << "6. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter key to insert: ";
+            cin >> key;
+            root = insertBST(root, key);
+            cout << "Inserted.\n";
+            break;
+
+        case 2:
+            cout << "Enter key to delete: ";
+            cin >> key;
+            root = deleteNode(root, key);
+            cout << "Deleted if existed.\n";
+            break;
+
+        case 3:
+            cout << "Maximum Depth: " << maxDepth(root) << endl;
+            break;
+
+        case 4:
+            cout << "Minimum Depth: " << minDepth(root) << endl;
+            break;
+
+        case 5:
+            cout << "Inorder Traversal: ";
+            inorder(root);
+            cout << endl;
+            break;
+
+        case 6:
+            return 0;
+
+        default:
+            cout << "Invalid Choice!\n";
+        }
+    }
+}
