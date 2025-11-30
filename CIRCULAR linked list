@@ -1,0 +1,278 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+class CircularLinkedList {
+    Node* head;
+public:
+    CircularLinkedList() {
+        head = nullptr;
+    }
+
+    // Helper to check empty
+    bool isEmpty() {
+        return head == nullptr;
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "List is empty.\n";
+            return;
+        }
+        cout << "Circular Linked List: ";
+        Node* temp = head;
+        do {
+            cout << temp->data << " -> ";
+            temp = temp->next;
+        } while (temp != head);
+        cout << "(back to head)\n";
+    }
+
+    // Insert at beginning
+    void insertAtBeginning(int value) {
+        Node* newNode = new Node{value, nullptr};
+        if (head == nullptr) {
+            head = newNode;
+            newNode->next = head; // circular
+        } else {
+            Node* last = head;
+            while (last->next != head)
+                last = last->next;
+            newNode->next = head;
+            head = newNode;
+            last->next = head;
+        }
+        cout << value << " inserted at beginning.\n";
+    }
+
+    // Insert at end
+    void insertAtEnd(int value) {
+        Node* newNode = new Node{value, nullptr};
+        if (head == nullptr) {
+            head = newNode;
+            newNode->next = head;
+        } else {
+            Node* last = head;
+            while (last->next != head)
+                last = last->next;
+            last->next = newNode;
+            newNode->next = head;
+        }
+        cout << value << " inserted at end.\n";
+    }
+
+    // Insert AFTER a specific value
+    void insertAfterValue(int key, int value) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+        Node* temp = head;
+        bool found = false;
+
+        do {
+            if (temp->data == key) {
+                found = true;
+                break;
+            }
+            temp = temp->next;
+        } while (temp != head);
+
+        if (!found) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        Node* newNode = new Node{value, nullptr};
+        newNode->next = temp->next;
+        temp->next = newNode;
+        cout << value << " inserted after " << key << ".\n";
+    }
+
+    // Insert BEFORE a specific value
+    void insertBeforeValue(int key, int value) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        // If key is at head
+        if (head->data == key) {
+            insertAtBeginning(value);
+            return;
+        }
+
+        Node* prev = nullptr;
+        Node* curr = head;
+        bool found = false;
+
+        do {
+            prev = curr;
+            curr = curr->next;
+            if (curr->data == key) {
+                found = true;
+                break;
+            }
+        } while (curr != head);
+
+        if (!found) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        Node* newNode = new Node{value, nullptr};
+        newNode->next = curr;
+        prev->next = newNode;
+        cout << value << " inserted before " << key << ".\n";
+    }
+
+    // Delete specific node by value (can be head, last, middle)
+    void deleteByValue(int key) {
+        if (head == nullptr) {
+            cout << "List is empty. Nothing to delete.\n";
+            return;
+        }
+
+        Node* curr = head;
+        Node* prev = nullptr;
+
+        // Case: key at head
+        if (head->data == key) {
+            // Single node
+            if (head->next == head) {
+                cout << "Node with value " << head->data << " deleted.\n";
+                delete head;
+                head = nullptr;
+                return;
+            }
+            // More than one node
+            Node* last = head;
+            while (last->next != head)
+                last = last->next;
+
+            Node* temp = head;
+            head = head->next;
+            last->next = head;
+            cout << "Node with value " << temp->data << " deleted.\n";
+            delete temp;
+            return;
+        }
+
+        // For middle or last nodes
+        bool found = false;
+        do {
+            prev = curr;
+            curr = curr->next;
+            if (curr->data == key) {
+                found = true;
+                break;
+            }
+        } while (curr != head);
+
+        if (!found) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        prev->next = curr->next;
+        cout << "Node with value " << curr->data << " deleted.\n";
+        delete curr;
+    }
+
+    // Search for a node
+    void search(int key) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        Node* temp = head;
+        int pos = 1;
+        do {
+            if (temp->data == key) {
+                cout << "Node with value " << key << " found at position " << pos << " (from head).\n";
+                return;
+            }
+            temp = temp->next;
+            pos++;
+        } while (temp != head);
+
+        cout << "Node with value " << key << " not found in the list.\n";
+    }
+};
+
+int main() {
+    CircularLinkedList clist;
+    int choice, value, key;
+
+    while (true) {
+        cout << "\n--- CIRCULAR LINKED LIST MENU ---\n";
+        cout << "1. Insert at beginning\n";
+        cout << "2. Insert at end\n";
+        cout << "3. Insert BEFORE a given value\n";
+        cout << "4. Insert AFTER a given value\n";
+        cout << "5. Delete a specific value\n";
+        cout << "6. Search a value\n";
+        cout << "7. Display list\n";
+        cout << "8. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter value to insert at beginning: ";
+            cin >> value;
+            clist.insertAtBeginning(value);
+            break;
+
+        case 2:
+            cout << "Enter value to insert at end: ";
+            cin >> value;
+            clist.insertAtEnd(value);
+            break;
+
+        case 3:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            cout << "Insert before which value? ";
+            cin >> key;
+            clist.insertBeforeValue(key, value);
+            break;
+
+        case 4:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            cout << "Insert after which value? ";
+            cin >> key;
+            clist.insertAfterValue(key, value);
+            break;
+
+        case 5:
+            cout << "Enter value to delete: ";
+            cin >> key;
+            clist.deleteByValue(key);
+            break;
+
+        case 6:
+            cout << "Enter value to search: ";
+            cin >> key;
+            clist.search(key);
+            break;
+
+        case 7:
+            clist.display();
+            break;
+
+        case 8:
+            cout << "Exiting...\n";
+            return 0;
+
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    }
+}
