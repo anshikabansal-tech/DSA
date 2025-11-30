@@ -1,0 +1,21 @@
+class TriDiagonal {
+    int n;
+    int *b;    // size = 3n - 2
+public:
+    TriDiagonal(int n) {
+        this->n = n;
+        b = new int[3*n - 2]{0};
+    }
+    void set(int i, int j, int x) {
+        if (i == j)             b[i] = x;                      // main
+        else if (j == i + 1)    b[n + i] = x;                  // upper
+        else if (i == j + 1)    b[2*n - 1 + j] = x;            // lower
+        // else ignore, must be 0
+    }
+    int get(int i, int j) {
+        if (i == j)             return b[i];
+        else if (j == i + 1)    return b[n + i];
+        else if (i == j + 1)    return b[2*n - 1 + j];
+        return 0;
+    }
+};
