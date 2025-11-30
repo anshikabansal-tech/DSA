@@ -1,0 +1,253 @@
+#include <iostream>
+using namespace std;
+
+struct DNode {
+    int data;
+    DNode* prev;
+    DNode* next;
+};
+
+class DoublyLinkedList {
+    DNode* head;
+public:
+    DoublyLinkedList() {
+        head = nullptr;
+    }
+
+    bool isEmpty() {
+        return head == nullptr;
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "List is empty.\n";
+            return;
+        }
+        cout << "Doubly Linked List (forward): ";
+        DNode* temp = head;
+        while (temp != nullptr) {
+            cout << temp->data << " <-> ";
+            temp = temp->next;
+        }
+        cout << "NULL\n";
+    }
+
+    // Insert at beginning
+    void insertAtBeginning(int value) {
+        DNode* newNode = new DNode{value, nullptr, nullptr};
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
+        }
+        cout << value << " inserted at beginning.\n";
+    }
+
+    // Insert at end
+    void insertAtEnd(int value) {
+        DNode* newNode = new DNode{value, nullptr, nullptr};
+        if (head == nullptr) {
+            head = newNode;
+            cout << value << " inserted at end.\n";
+            return;
+        }
+
+        DNode* temp = head;
+        while (temp->next != nullptr)
+            temp = temp->next;
+
+        temp->next = newNode;
+        newNode->prev = temp;
+        cout << value << " inserted at end.\n";
+    }
+
+    // Insert AFTER a node with given key
+    void insertAfterValue(int key, int value) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        DNode* temp = head;
+        while (temp != nullptr && temp->data != key)
+            temp = temp->next;
+
+        if (temp == nullptr) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        DNode* newNode = new DNode{value, nullptr, nullptr};
+        newNode->next = temp->next;
+        newNode->prev = temp;
+
+        if (temp->next != nullptr)
+            temp->next->prev = newNode;
+
+        temp->next = newNode;
+
+        cout << value << " inserted after " << key << ".\n";
+    }
+
+    // Insert BEFORE a node with given key
+    void insertBeforeValue(int key, int value) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        // If key is at head
+        if (head->data == key) {
+            insertAtBeginning(value);
+            return;
+        }
+
+        DNode* temp = head;
+        while (temp != nullptr && temp->data != key)
+            temp = temp->next;
+
+        if (temp == nullptr) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        DNode* newNode = new DNode{value, nullptr, nullptr};
+        newNode->next = temp;
+        newNode->prev = temp->prev;
+        temp->prev->next = newNode;
+        temp->prev = newNode;
+
+        cout << value << " inserted before " << key << ".\n";
+    }
+
+    // Delete a node by value (can be head, last, middle)
+    void deleteByValue(int key) {
+        if (head == nullptr) {
+            cout << "List is empty. Nothing to delete.\n";
+            return;
+        }
+
+        DNode* temp = head;
+
+        // Find node with key
+        while (temp != nullptr && temp->data != key)
+            temp = temp->next;
+
+        if (temp == nullptr) {
+            cout << "Node with value " << key << " not found.\n";
+            return;
+        }
+
+        // If node is head
+        if (temp == head) {
+            head = head->next;
+            if (head != nullptr)
+                head->prev = nullptr;
+        } else {
+            temp->prev->next = temp->next;
+        }
+
+        // If node is not last
+        if (temp->next != nullptr) {
+            temp->next->prev = temp->prev;
+        }
+
+        cout << "Node with value " << temp->data << " deleted.\n";
+        delete temp;
+    }
+
+    // Search a node by value
+    void search(int key) {
+        if (head == nullptr) {
+            cout << "List is empty.\n";
+            return;
+        }
+
+        DNode* temp = head;
+        int pos = 1;
+        while (temp != nullptr) {
+            if (temp->data == key) {
+                cout << "Node with value " << key << " found at position " << pos << " from head.\n";
+                return;
+            }
+            temp = temp->next;
+            pos++;
+        }
+
+        cout << "Node with value " << key << " not found in the list.\n";
+    }
+};
+
+int main() {
+    DoublyLinkedList dlist;
+    int choice, value, key;
+
+    while (true) {
+        cout << "\n--- DOUBLY LINKED LIST MENU ---\n";
+        cout << "1. Insert at beginning\n";
+        cout << "2. Insert at end\n";
+        cout << "3. Insert BEFORE a given value\n";
+        cout << "4. Insert AFTER a given value\n";
+        cout << "5. Delete a specific value\n";
+        cout << "6. Search a value\n";
+        cout << "7. Display list\n";
+        cout << "8. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter value to insert at beginning: ";
+            cin >> value;
+            dlist.insertAtBeginning(value);
+            break;
+
+        case 2:
+            cout << "Enter value to insert at end: ";
+            cin >> value;
+            dlist.insertAtEnd(value);
+            break;
+
+        case 3:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            cout << "Insert before which value? ";
+            cin >> key;
+            dlist.insertBeforeValue(key, value);
+            break;
+
+        case 4:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            cout << "Insert after which value? ";
+            cin >> key;
+            dlist.insertAfterValue(key, value);
+            break;
+
+        case 5:
+            cout << "Enter value to delete: ";
+            cin >> key;
+            dlist.deleteByValue(key);
+            break;
+
+        case 6:
+            cout << "Enter value to search: ";
+            cin >> key;
+            dlist.search(key);
+            break;
+
+        case 7:
+            dlist.display();
+            break;
+
+        case 8:
+            cout << "Exiting...\n";
+            return 0;
+
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    }
+}
