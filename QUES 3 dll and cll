@@ -1,0 +1,44 @@
+#include <iostream>
+using namespace std;
+
+// Doubly Linked List Node
+struct DNode {
+    char data;
+    DNode* next;
+    DNode* prev;
+};
+
+// Circular Linked List Node
+struct CNode {
+    int data;
+    CNode* next;
+};
+
+// Doubly List Size
+int sizeDoubly(DNode* head) {
+    int count = 0;
+    while (head) {
+        count++;
+        head = head->next;
+    }
+    return count;
+}
+
+// Circular List Size
+int sizeCircular(CNode* head) {
+    if (!head) return 0;
+    int count = 0;
+    CNode* temp = head;
+    do {
+        count++;
+        temp = temp->next;
+    } while (temp != head);
+    return count;
+}
+
+int main() {
+    // Example
+    DNode* dh = nullptr;
+    cout << "Size functions implemented above.\n";
+    return 0;
+}
