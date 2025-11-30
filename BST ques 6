@@ -1,0 +1,78 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 100
+int heapArr[MAX];
+int heapSize = 0;
+
+void swap(int &a, int &b) {
+    int t = a; a = b; b = t;
+}
+
+void heapifyUp(int index) {
+    while (index > 0) {
+        int parent = (index - 1) / 2;
+        if (heapArr[parent] < heapArr[index]) {
+            swap(heapArr[parent], heapArr[index]);
+            index = parent;
+        } else break;
+    }
+}
+
+void heapifyDown(int index) {
+    while (true) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int largest = index;
+
+        if (left < heapSize && heapArr[left] > heapArr[largest]) largest = left;
+        if (right < heapSize && heapArr[right] > heapArr[largest]) largest = right;
+
+        if (largest == index) break;
+        swap(heapArr[index], heapArr[largest]);
+        index = largest;
+    }
+}
+
+void insertPQ(int x) {
+    heapArr[heapSize] = x;
+    heapifyUp(heapSize);
+    heapSize++;
+}
+
+int getMax() {
+    if (heapSize == 0) return -1;
+    return heapArr[0];
+}
+
+void deleteMax() {
+    if (heapSize == 0) return;
+    heapArr[0] = heapArr[heapSize - 1];
+    heapSize--;
+    heapifyDown(0);
+}
+
+void displayPQ() {
+    for (int i = 0; i < heapSize; i++)
+        cout << heapArr[i] << " ";
+    cout << endl;
+}
+
+int main() {
+    while (true) {
+        cout << "\n1. Insert\n2. Delete Max\n3. Get Max\n4. Display\n5. Exit\nChoice: ";
+        int ch;
+        cin >> ch;
+        if (ch == 1) {
+            int x; 
+            cout << "Enter value: ";
+            cin >> x;
+            insertPQ(x);
+        }
+        else if (ch == 2) deleteMax();
+        else if (ch == 3) cout << "Max: " << getMax() << endl;
+        else if (ch == 4) displayPQ();
+        else if (ch == 5) break;
+    }
+    return 0;
+}
