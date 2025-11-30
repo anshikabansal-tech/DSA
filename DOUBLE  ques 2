@@ -1,0 +1,42 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+void insertEnd(Node* &head, int val) {
+    Node* newNode = new Node{val, nullptr};
+    if (!head) {
+        head = newNode;
+        newNode->next = head; // Circular
+        return;
+    }
+    Node* temp = head;
+    while (temp->next != head) temp = temp->next;
+    temp->next = newNode;
+    newNode->next = head;
+}
+
+void displayCircular(Node* head) {
+    if (!head) return;
+    Node* temp = head;
+    do {
+        cout << temp->data << " ";
+        temp = temp->next;
+    } while (temp != head);
+    cout << head->data << endl;  // repeat head
+}
+
+int main() {
+    Node* head = nullptr;
+    insertEnd(head, 20);
+    insertEnd(head, 100);
+    insertEnd(head, 40);
+    insertEnd(head, 80);
+    insertEnd(head, 60);
+
+    displayCircular(head);
+    return 0;
+}
