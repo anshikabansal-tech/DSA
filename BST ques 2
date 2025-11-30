@@ -1,0 +1,39 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int key;
+    Node *left, *right;
+    Node(int k) : key(k), left(NULL), right(NULL) {}
+};
+
+// ---------- INSERT ----------
+Node* insertBST(Node* root, int key) {
+    if (!root) return new Node(key);
+    if (key < root->key)
+        root->left = insertBST(root->left, key);
+    else if (key > root->key)
+        root->right = insertBST(root->right, key);
+    // if equal -> ignore (no duplicates)
+    return root;
+}
+
+// ---------- (a) SEARCH (RECURSIVE) ----------
+Node* searchRec(Node* root, int key) {
+    if (!root || root->key == key) return root;
+    if (key < root->key) return searchRec(root->left, key);
+    else return searchRec(root->right, key);
+}
+
+// ---------- (a) SEARCH (ITERATIVE) ----------
+Node* searchIter(Node* root, int key) {
+    Node* curr = root;
+    while (curr) {
+        if (key == curr->key) return curr;
+        else if (key < curr->key) curr = curr->left;
+        else curr = curr->right;
+    }
+    return NULL;
+}
+
+// ----------
