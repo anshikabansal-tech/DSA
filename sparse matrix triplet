@@ -1,0 +1,166 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 100
+
+struct Sparse {
+    int row, col, val; // triplet format
+};
+
+void inputSparse(Sparse s[], int &m, int &n, int &nonZero) {
+    cout << "Enter rows, cols and number of non-zero elements: ";
+    cin >> m >> n >> nonZero;
+
+    s[0].row = m;
+    s[0].col = n;
+    s[0].val = nonZero;
+
+    cout << "Enter non-zero elements (row col val): \n";
+    for (int i = 1; i <= nonZero; i++) {
+        cin >> s[i].row >> s[i].col >> s[i].val;
+    }
+}
+
+// (a) Transpose of Sparse Matrix
+void transpose(Sparse s[], Sparse t[]) {
+    int m = s[0].row;
+    int n = s[0].col;
+    int nonZero = s[0].val;
+
+    t[0].row = n;
+    t[0].col = m;
+    t[0].val = nonZero;
+
+    int k = 1;
+    for (int i = 0; i < n; i++) {
+        for (int j = 1; j <= nonZero; j++) {
+            if (s[j].col == i) {
+                t[k].row = s[j].col;
+                t[k].col = s[j].row;
+                t[k].val = s[j].val;
+                k++;
+            }
+        }
+    }
+}
+
+// (b) Addition of two Sparse Matrices
+void addSparse(Sparse a[], Sparse b[], Sparse c[]) {
+    if (a[0].row != b[0].row || a[0].col != b[0].col) {
+        cout << "Addition not possible: Dimensions mismatch.\n";
+        return;
+    }
+
+    int i = 1, j = 1, k = 1;
+    int na = a[0].val, nb = b[0].val;
+
+    c[0].row = a[0].row;
+    c[0].col = a[0].col;
+
+    while (i <= na && j <= nb) {
+        if (a[i].row < b[j].row ||
+            (a[i].row == b[j].row && a[i].col < b[j].col)) {
+            c[k++] = a[i++];
+        } else if (b[j].row < a[i].row ||
+                   (a[i].row == b[j].row && b[j].col < a[i].col)) {
+            c[k++] = b[j++];
+        } else {
+            int sum = a[i].val + b[j].val;
+            if (sum != 0) {
+                c[k].row = a[i].row;
+                c[k].col = a[i].col;
+                c[k].val = sum;
+                k++;
+            }
+            i++; j++;
+        }
+    }
+
+    while (i <= na) c[k++] = a[i++];
+    while (j <= nb) c[k++] = b[j++];
+
+    c[0].val = k - 1;
+}
+
+// (c) Multiplication of Sparse Matrices
+void multiplySparse(Sparse a[], Sparse b[], Sparse result[]) {
+    if (a[0].col != b[0].row) {
+        cout << "Multiplication not possible: Dimensions mismatch.\n";
+        return;
+    }
+
+    Sparse bt[MAX];
+    transpose(b, bt);
+
+    int k = 1;
+    result[0].row = a[0].row;
+    result[0].col = b[0].col;
+
+    for (int i = 1; i <= a[0].val; ) {
+        int row = a[i].row;
+        for (int j = 1; j <= bt[0].val; ) {
+            int col = bt[j].row;
+            int sum = 0;
+
+            int p = i;
+            int q = j;
+
+            while (p <= a[0].val && a[p].row == row &&
+                   q <= bt[0].val && bt[q].row == col) {
+
+                if (a[p].col < bt[q].col) p++;
+                else if (a[p].col > bt[q].col) q++;
+                else {
+                    sum += a[p].val * bt[q].val;
+                    p++; q++;
+                }
+            }
+
+            if (sum != 0) {
+                result[k].row = row;
+                result[k].col = col;
+                result[k].val = sum;
+                k++;
+            }
+
+            while (j <= bt[0].val && bt[j].row == col) j++;
+        }
+
+        while (i <= a[0].val && a[i].row == row) i++;
+    }
+
+    result[0].val = k - 1;
+}
+
+void display(Sparse s[]) {
+    cout << "\nTriplet Representation: \n";
+    cout << "Row Col Value\n";
+    for (int i = 0; i <= s[0].val; i++) {
+        cout << s[i].row << "   " << s[i].col << "   " << s[i].val << endl;
+    }
+}
+
+int main() {
+    Sparse a[MAX], b[MAX], c[MAX], t[MAX], m[MAX];
+    int m1, n1, nz1, m2, n2, nz2;
+
+    cout << "Enter Sparse Matrix A:\n";
+    inputSparse(a, m1, n1, nz1);
+
+    cout << "\nEnter Sparse Matrix B:\n";
+    inputSparse(b, m2, n2, nz2);
+
+    cout << "\n-- Transpose of A --";
+    transpose(a, t);
+    display(t);
+
+    cout << "\n-- Addition A + B --";
+    addSparse(a, b, c);
+    display(c);
+
+    cout << "\n-- Multiplication A × B --";
+    multiplySparse(a, b, m);
+    display(m);
+
+    return 0;
+}
